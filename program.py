@@ -11,11 +11,13 @@ import matplotlib.pyplot as plt
 # use python -m serial.tools.list_ports in terminal to see available ports
 # will only bee seen if microcontroller is plugged in
 # Available ports will change depending on micorcontroller used:
-# /dev/cu.Bluetooth-Incoming-Port
-# /dev/cu.usbmodem0010502595781
-# /dev/cu.usbmodem0010502595783
+'''
+Available Ports
+
+'''
 # get properties from used port
-ser = serial.Serial("/dev/cu.usbmodem0010502332261",baudrate=115200, 
+ser = serial.Serial("/dev/cu.usbmodem0010502332261",
+        baudrate=115200, 
         parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_ONE,
         bytesize=serial.EIGHTBITS,
@@ -50,7 +52,7 @@ for i  in np.arange(0,10,1):
     #SAVE CSV
     csv_arr = np.array(data) #store the data into an array for saving the csv file
     df = pd.DataFrame(csv_arr) # turn to dataframe
-    df.to_csv(str(t)+'.csv') #save the data using the time at which it was read
+    df.to_csv(str(t)+'.csv',index=False,header=False) #save the data using the time at which it was read
     if i == 0: #only look at the first contour plot of the loop
         plt.show()
     time.sleep(2) 
