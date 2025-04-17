@@ -4,6 +4,7 @@ import serial
 from datetime import datetime
 import time
 import matplotlib.pyplot as plt
+import re
 
 
 # PYSERIAL READ
@@ -13,37 +14,46 @@ import matplotlib.pyplot as plt
 # Available ports will change depending on micorcontroller used:
 '''
 Available Ports
-
+/dev/cu.Bluetooth-Incoming-Port
+/dev/cu.usbmodem0010502074221
+/dev/cu.usbmodem0010502074223
 '''
 # get properties from used port
-ser = serial.Serial("/dev/cu.usbmodem0010502332261",
-        baudrate=115200, 
+ser = serial.Serial("/dev/cu.usbmodem0010502074221",
+        baudrate=19200, 
         parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_ONE,
         bytesize=serial.EIGHTBITS,
-        timeout=2) 
+        timeout=20) 
 
 start = time.time()
 i=0
-while (time.time()< start+20): #for how long do we want it to run?
+ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+while (time.time()< start+10): #for how long do we want it to run?
 #for i  in np.arange(0,5,1): #how many times do we want it to run?
+
+
 
     #read from the microcontroller  (will run forever if there is nothing to read and no timout defined above)
     trash_data = ser.readline()
-    data = ser.readline().decode('utf-8').strip().split('\t') # read in the data, stop at an \n, take off junk at the end, split by tab
+    data = ser.readline().decode('utf-8',errors = 'ignore').strip().split('\t') # read in the data, stop at an \n, take off junk at the end, split by tab
     t = datetime.time(datetime.now()) # store the time right after the data has been read (for the name of the csv file)
+    
 
-
-    data = [float(x) for x in data] #turn each string into a float value
+    #data = [float(x) for x in data] #turn each string into a float value
+    data = [float(ansi_escape.sub('', x).strip()) for x in data ] # clean and turn to floats
+    
     for j in np.arange(0,len(data),1):
-        if data[j] <= -666: #account for a sensor that has died
+        if data[j] <= -666.00: #account for a sensor that has died
             data[j] = np.nan
+    print(data)        
 
 
     #SAVE CSV
     csv_arr = np.array(data) #store the data into an array for saving the csv file
     df = pd.DataFrame(csv_arr) # turn to dataframe
-    df.to_csv(str(t)+'.csv',index=False,header=False) #save the data using the time at which it was read
+     #save the data using the time at which it was read
+    df.to_csv(str(t)+'.csv',index=False,header=False)
 
     #CONTOUR PLOT
 
@@ -65,7 +75,7 @@ while (time.time()< start+20): #for how long do we want it to run?
         ax.set_ylabel('$y$-Position (cm)')
         plt.show()
         i=9
-    time.sleep(2) 
+    
 
     
     
