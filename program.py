@@ -1,3 +1,12 @@
+'''
+Program: Temp Data Visualizer
+
+Read in temperature data from a microcontroller, 
+create and display a coolored contour plot, and 
+save the data as a .csv file
+'''
+
+#import libraries
 import numpy as np
 import pandas as pd
 import serial
@@ -13,10 +22,8 @@ import re
 # will only bee seen if microcontroller is plugged in
 # Available ports will change depending on micorcontroller used:
 '''
-Available Ports
-/dev/cu.Bluetooth-Incoming-Port
-/dev/cu.usbmodem0010502074221
-/dev/cu.usbmodem0010502074223
+Available Ports:
+
 '''
 # get properties from used port
 ser = serial.Serial("/dev/cu.usbmodem0010502074221",
@@ -26,33 +33,44 @@ ser = serial.Serial("/dev/cu.usbmodem0010502074221",
         bytesize=serial.EIGHTBITS,
         timeout=20) 
 
+#initate time function
 start = time.time()
 i=0
+
+#we will get characters we cannot use, re.compile will allow us to strip those from the data
 ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
-while (time.time()< start+10): #for how long do we want it to run?
-#for i  in np.arange(0,5,1): #how many times do we want it to run?
+
+'''
+Two options for running the code:
+1. (while-loop) For how long do we want it to run?
+2. (for-loop) How many times do we want it to run?
+'''
+while (time.time()< start+10):
+#for i in np.arange(0,5,1): 
 
 
 
-    #read from the microcontroller  (will run forever if there is nothing to read and no timout defined above)
-    trash_data = ser.readline()
+    #read from the microcontroller 
+    trash_data = ser.readline() #read to the next endline to ensure data is not cut off
     data = ser.readline().decode('utf-8',errors = 'ignore').strip().split('\t') # read in the data, stop at an \n, take off junk at the end, split by tab
     t = datetime.time(datetime.now()) # store the time right after the data has been read (for the name of the csv file)
     
 
-    #data = [float(x) for x in data] #turn each string into a float value
-    data = [float(ansi_escape.sub('', x).strip()) for x in data ] # clean and turn to floats
+    # clean using re.compile from above and turn each entry into a float value
+    data = [float(ansi_escape.sub('', x).strip()) for x in data ] 
     
+    #check if any of the temp sensors have died/are not working
     for j in np.arange(0,len(data),1):
-        if data[j] <= -666.00: #account for a sensor that has died
+        if data[j] <= -666.00: #microcontroller is coded to send -666 if sensor is dead
             data[j] = np.nan
     print(data)        
 
+    #CSV SAVE
 
-    #SAVE CSV
-    csv_arr = np.array(data) #store the data into an array for saving the csv file
+    #store the data into an array for saving the csv file
+    csv_arr = np.array(data) 
     df = pd.DataFrame(csv_arr) # turn to dataframe
-     #save the data using the time at which it was read
+    #save the data using the time at which it was read
     df.to_csv(str(t)+'.csv',index=False,header=False)
 
     #CONTOUR PLOT
