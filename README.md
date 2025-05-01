@@ -1,17 +1,17 @@
 # Program: Temp Data Visualizer
 
-### Author: Valerie Hanes
+**Author:**  Valerie Hanes
 
-### Completed: May 1, 2025
+**Completed:** May 1, 2025
 
-### Purpose:
+**Purpose:**
 Read in temperature data from a microcontroller, 
 create and display a coolored contour plot, and 
 save the data as a .csv file
 
 ## Configuration
 
-Imported Libraries:
+**Imported Libraries:**
 
 * numpy 
   * Used to access arrays, nan, and other opperations
@@ -29,6 +29,6 @@ Imported Libraries:
   * Used to strip unwanted characters attached to the incoming string of data
 
 ## Flow
-
-
+```mermaid
+graph TB
 
