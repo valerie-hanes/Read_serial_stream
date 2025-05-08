@@ -24,7 +24,7 @@ import re
 '''
 Available Ports:
 
-'''
+
 # get properties from used port
 ser = serial.Serial("/dev/cu.usbmodem0010502074221",
         baudrate=19200, 
@@ -32,7 +32,7 @@ ser = serial.Serial("/dev/cu.usbmodem0010502074221",
         stopbits=serial.STOPBITS_ONE,
         bytesize=serial.EIGHTBITS,
         timeout=20) 
-
+'''
 #initate time function
 start = time.time()
 i=0
@@ -49,7 +49,7 @@ while (time.time()< start+10):
 #for i in np.arange(0,5,1): 
 
 
-
+    '''
     #read from the microcontroller 
     trash_data = ser.readline() #read to the next endline to ensure data is not cut off
     data = ser.readline().decode('utf-8',errors = 'ignore').strip().split('\t') # read in the data, stop at an \n, take off junk at the end, split by tab
@@ -64,8 +64,19 @@ while (time.time()< start+10):
         if data[j] <= -666.00: #microcontroller is coded to send -666 if sensor is dead
             data[j] = np.nan
     print(data)        
-
+    '''
     #CSV SAVE
+    data = [23,23,23,23,23,24,24,24,24,25,
+            23,23,23,23,24,24,24,24,24,25,
+            23,24,25,25,25,25,25,25,25,26,
+            24,24,24,25,25,25,25,25,26,26,
+            24,24,24,24,25,25,26,27,27,27,
+            25,25,25,26,27,27,27,28,28,28,
+            25,25,25,25,25,26,26,26,26,26,
+            26,26,26,26,26,27,27,27,28,28,
+            26,26,26,26,26,27,27,28,28,28,
+            27,27,27,27,28,28,29,29,29,30]
+    t = datetime.time(datetime.now())
 
     #store the data into an array for saving the csv file
     csv_arr = np.array(data) 
