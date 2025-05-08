@@ -14,7 +14,6 @@ from datetime import datetime
 import time
 import matplotlib.pyplot as plt
 import re
-from matplotlib.animation import FuncAnimation
 
 
 # PYSERIAL READ
@@ -88,12 +87,6 @@ while (time.time()< start+10):
         num_files = num_files+1
 
     #CONTOUR PLOT
-
-        
-    contour_arr = (np.array(data)) #store the data into an array for the contour plot
-    contour_arr = contour_arr.reshape([10,10]) # change to 10 by 10
-    contour_arr = contour_arr[::-1] #flip contour plot array to make it correspond to the plate
-    
     plt.ion() #allow plots to be interactive
 
     x = np.arange(0,33+(1.0/3.0),(1.0/3.0)+3) #x values in 10 "rows" on a 30 cm board
@@ -112,6 +105,11 @@ while (time.time()< start+10):
     for old_data in ax.collections:
         old_data.remove()
 
+    #store the data into a 10 by 10 array corresponding to the plate for the contour plot
+    contour_arr = (np.array(data)) 
+    contour_arr = contour_arr.reshape([10,10]) 
+    contour_arr = contour_arr[::-1] 
+    
     #setting the contour/color of the plot
     c = ax.contourf(x,y,contour_arr,levels=1000,cmap='jet') 
 

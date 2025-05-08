@@ -2,12 +2,10 @@
 
 **Author:**  Valerie Hanes
 
-**Completed:** May 1, 2025
+**Completed:** May, 2025
 
 **Purpose:**
-Read in temperature data from a microcontroller, 
-create and display a coolored contour plot, and 
-save the data as a .csv file
+Read in temperature data from a microcontroller, create and display a coolored contour plot, and save the data as a .csv file. The contour plot will be updated each time new data is read in and will match the physical board. The .csv file will be labeled with the time stamp of the data-read.
 
 ## Configuration
 
