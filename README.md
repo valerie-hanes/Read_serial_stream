@@ -28,7 +28,5 @@ save the data as a .csv file
 * re
   * Used to strip unwanted characters attached to the incoming string of data
 
-## Flow
-```mermaid
-graph TB
+
 
