@@ -36,6 +36,7 @@ ser = serial.Serial("/dev/cu.usbmodem0010502074221",
 '''
 #initate time function
 start = time.time()
+#define variables
 num_plots = 0
 num_files = 0
 #we will get characters we cannot use, re.compile will allow us to strip those from the data
@@ -64,6 +65,7 @@ while (time.time()< start+10):
     print(data)        
     '''
     #CSV SAVE
+    #data to work with while not hooked up to the micro controller
     data = [23,23,23,23,23,24,24,24,24,25,
             23,23,23,23,24,24,24,24,24,25,
             23,24,25,25,25,25,25,25,25,26,
@@ -76,12 +78,12 @@ while (time.time()< start+10):
             27,27,27,27,28,28,29,29,29,30]
     t = datetime.time(datetime.now())
 
+    #do not allow too many files
     if(num_files<20):
-    #store the data into an array for saving the csv file
+        #store the data into an array for saving the csv file
         csv_arr = np.array(data) 
         df = pd.DataFrame(csv_arr) # turn to dataframe
-    #save the data using the time at which it was read
-
+        #save the data using the time at which it was read
         df.to_csv(str(t)+'.csv',index=False,header=False)
         num_files = num_files+1
 
@@ -92,11 +94,13 @@ while (time.time()< start+10):
     contour_arr = contour_arr.reshape([10,10]) # change to 10 by 10
     contour_arr = contour_arr[::-1] #flip contour plot array to make it correspond to the plate
     
-    plt.ion() 
+    plt.ion() #allow plots to be interactive
 
     x = np.arange(0,33+(1.0/3.0),(1.0/3.0)+3) #x values in 10 "rows" on a 30 cm board
     y=np.arange(0,33+(1.0/3.0),(1.0/3.0)+3) #y values in 10 "columns" on a 30 cm board
     #print(contour_arr)
+
+    #create the plot once
     if num_plots == 0:
         fig, ax = plt.subplots() 
         ax.set_xlabel('$x$-Position (cm)')
@@ -104,14 +108,19 @@ while (time.time()< start+10):
         num_plots += 1
         plt.show()
 
+    #remove data from previous read
     for old_data in ax.collections:
         old_data.remove()
 
-    c = ax.contourf(x,y,contour_arr,levels=1000,cmap='jet') #setting the contour/color of the plot
+    #setting the contour/color of the plot
+    c = ax.contourf(x,y,contour_arr,levels=1000,cmap='jet') 
+
+    #add color bar to plot
     if num_plots == 1:
-        plt.colorbar(c,label = 'Temperature ($ \degree$C)') #add color bar to plot
+        plt.colorbar(c,label = 'Temperature ($ \degree$C)') 
         num_plots += 1
 
+    #draw the updated plot immediatly
     fig.canvas.draw()
     fig.canvas.flush_events()
     
