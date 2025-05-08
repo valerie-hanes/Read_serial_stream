@@ -14,6 +14,7 @@ from datetime import datetime
 import time
 import matplotlib.pyplot as plt
 import re
+from matplotlib.animation import FuncAnimation
 
 
 # PYSERIAL READ
@@ -24,7 +25,7 @@ import re
 '''
 Available Ports:
 
-'''
+
 # get properties from used port
 ser = serial.Serial("/dev/cu.usbmodem0010502074221",
         baudrate=19200, 
@@ -32,10 +33,10 @@ ser = serial.Serial("/dev/cu.usbmodem0010502074221",
         stopbits=serial.STOPBITS_ONE,
         bytesize=serial.EIGHTBITS,
         timeout=20) 
-
+'''
 #initate time function
 start = time.time()
-i=0
+num_plots = 0
 num_files = 0
 #we will get characters we cannot use, re.compile will allow us to strip those from the data
 ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
@@ -44,7 +45,9 @@ ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
 Running the code:
 1. (while-loop) For how long do we want it to run?
 '''
-while (time.time()< start+1):
+while (time.time()< start+10):
+
+    '''    
     #read from the microcontroller 
     trash_data = ser.readline() #read to the next endline to ensure data is not cut off
     data = ser.readline().decode('utf-8',errors = 'ignore').strip().split('\t') # read in the data, stop at an \n, take off junk at the end, split by tab
@@ -59,11 +62,21 @@ while (time.time()< start+1):
         if data[j] <= -666.00: #microcontroller is coded to send -666 if sensor is dead
             data[j] = np.nan
     print(data)        
-
+    '''
     #CSV SAVE
-    
+    data = [23,23,23,23,23,24,24,24,24,25,
+            23,23,23,23,24,24,24,24,24,25,
+            23,24,25,25,25,25,25,25,25,26,
+            24,24,24,25,25,25,25,25,26,26,
+            24,24,24,24,25,25,26,27,27,27,
+            25,25,25,26,27,27,27,28,28,28,
+            25,25,25,25,25,26,26,26,26,26,
+            26,26,26,26,26,27,27,27,28,28,
+            26,26,26,26,26,27,27,28,28.1,28,
+            27,27,27,27,28,28,29,29,29,30]
+    t = datetime.time(datetime.now())
 
-    if(num_files<2):
+    if(num_files<20):
     #store the data into an array for saving the csv file
         csv_arr = np.array(data) 
         df = pd.DataFrame(csv_arr) # turn to dataframe
@@ -78,18 +91,32 @@ while (time.time()< start+1):
     contour_arr = (np.array(data)) #store the data into an array for the contour plot
     contour_arr = contour_arr.reshape([10,10]) # change to 10 by 10
     contour_arr = contour_arr[::-1] #flip contour plot array to make it correspond to the plate
-
+    
+    plt.ion() 
 
     x = np.arange(0,33+(1.0/3.0),(1.0/3.0)+3) #x values in 10 "rows" on a 30 cm board
     y=np.arange(0,33+(1.0/3.0),(1.0/3.0)+3) #y values in 10 "columns" on a 30 cm board
     #print(contour_arr)
+    if num_plots == 0:
+        fig, ax = plt.subplots() 
+        ax.set_xlabel('$x$-Position (cm)')
+        ax.set_ylabel('$y$-Position (cm)')
+        num_plots += 1
+        plt.show()
 
-    fig, ax = plt.subplots() 
+    for old_data in ax.collections:
+        old_data.remove()
+
     c = ax.contourf(x,y,contour_arr,levels=1000,cmap='jet') #setting the contour/color of the plot
-    plt.colorbar(c,label = 'Temperature ($ \degree$C)') #add color bar to plot
-    ax.set_xlabel('$x$-Position (cm)')
-    ax.set_ylabel('$y$-Position (cm)')
-    plt.show()
+    if num_plots == 1:
+        plt.colorbar(c,label = 'Temperature ($ \degree$C)') #add color bar to plot
+        num_plots += 1
+
+    fig.canvas.draw()
+    fig.canvas.flush_events()
+    
+
+
     
     
 
